@@ -1,12 +1,19 @@
-import React from 'react';
-import Movies from './components/movies'
+import React, {Component} from "react";
+import "./App.css";
+import Filter from "./components/filter"
+import Movies from "./components/movies"
 
-import './App.css';
+class App extends Component{
 
-function App() {
-  return (
-   <main className = "container"><Movies/></main>
-  );
-}
-
-export default App;
+    
+    render(){
+        return(
+            <React.Fragment>
+                <Movies/>
+                <Filter />
+                
+            </React.Fragment>
+        )
+    }
+  }
+    export default App;
