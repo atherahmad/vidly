@@ -1,7 +1,8 @@
-import React , {Component} from "react";
+import React  from "react";
+import { Dropdown } from 'react-bootstrap';
 
 
-class Filter extends Component{
+
   
   /* constructor(props){
 
@@ -12,24 +13,27 @@ class Filter extends Component{
     const allMovies = this.props.movies 
   }*/
 
-    render(){
+    const Filter =props=>{
+
+      //const {movies} = props;
+      //console.log("filter component", movies)
 
         return(
 
-        <div className="dropdown show">
-    
-        <p className="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          All Movies
-        </p>
-      
-        <div className="dropdown-menu" aria-labelledby="dropdownMenuLink">
-          <p className="dropdown-item" >Action</p>
-          <p className="dropdown-item" >Drama</p>
-          <p className="dropdown-item" >Romance</p>
-        </div>
-        
-      </div>)
-    }
-}
-
-export default Filter;
+          <Dropdown>
+              <Dropdown.Toggle variant="success" id="dropdown-basic">
+                Filter Movies
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item 
+                  onClick={()=>props.filterHandler("Action")}>Action</Dropdown.Item>
+                <Dropdown.Item 
+                  onClick={()=>props.filterHandler("Thriller")}>Thriller</Dropdown.Item>
+                <Dropdown.Item 
+                  onClick={()=>props.filterHandler("Comedy")}>Comedy</Dropdown.Item>
+                <Dropdown.Item 
+                  onClick={()=>props.filterHandler("allMovies")}>All Movies</Dropdown.Item>
+              </Dropdown.Menu>
+          </Dropdown>)
+    } 
+    export default Filter;

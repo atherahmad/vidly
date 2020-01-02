@@ -3,6 +3,7 @@ import Like from "./common/like.jsx"
 import Pagination from "./common/pagination"
 import {getMovies} from '../services/fakeMovieService';
 import {paginate} from "../utils/paginate"
+import Filter from "./filter"
 
 
 
@@ -10,19 +11,43 @@ import {paginate} from "../utils/paginate"
  class Movies extends Component {
      state={
          movies: getMovies(),
-         pageSize : 4,
-         currentPage : 1
+         pageSize : 3   ,
+         currentPage : 1,
+         filtering : false,
+         show : "allMovies",
+         sorting: false,
+         sortBy:"",
+         lastSorting: "none",
+         sortType:""
      }
+
+     sortHandler =(selection)=>{
+        if(selection === this.state.lastSorting) this.setState({sortType: -1,lastSorting:"none"})
+        else this.setState({sorting: true, sortBy:selection, lastSorting:selection , sortType:1})
+     }
+     filterHandler=(selection)=>{
+    
+        if(selection === "allMovies") {
+            this.setState({filtering: false, show:selection})
+            return}
+        this.setState({filtering: true, show:selection})
+        
+
+     }
+
      handlePageChange=(page)=>{
          console.log(page)
          this.setState({currentPage:page})
      }
-     handleDelete = selectedMovie=>{
+
+    handleDelete=selectedMovie=>{
         
         const movies= this.state.movies.filter(m=>m._id !== selectedMovie._id)
         this.setState({movies:movies})
-        console.log("deleteing activated")
+
     }
+        
+    
     handleFavourite =(movie)=>{
 
         const movies= [...this.state.movies]
@@ -35,16 +60,48 @@ import {paginate} from "../utils/paginate"
 
 
     }
+
+    
+
+        
+    
+    
     render() {
 
-        const count = this.state.movies.length;
-        const {pageSize, currentPage, movies} = this.state;
+        let count = this.state.movies.length;
+        let {pageSize, currentPage, movies, sortType} = this.state;
+        let iconClass = "";
+        this.state.sortType===1? iconClass = "fa fa-chevron-down" : iconClass = "fa fa-chevron-up" 
+
+
+        console.log(this.state.filtering)
+
+        if(this.state.sorting){
+            if(this.state.sortBy === "genre.name")
+            movies.sort((a, b) => (a.genre.name > b.genre.name) ? sortType : -(sortType))
+            else
+            movies.sort((a, b) => (a[(this.state.sortBy)] > b[(this.state.sortBy)]) ? sortType : -(sortType))
+
+
+        }
+
+        if(this.state.filtering){
+            movies=[...movies.filter((m)=>m.genre.name===this.state.show)]
+            
+            count = movies.length;
+            console.log(movies, "and ", count)
+            
+            } 
+           
 
         if(count === 0)
 
           return <p>There are no movies in the database</p>;
+        let paginatedMovies=[];
+        if(count <= pageSize)  paginatedMovies=[...movies]
+        else  paginatedMovies = paginate(movies, currentPage, pageSize)
+
         
-        const paginatedMovies = paginate(movies, currentPage, pageSize)
        
         return (
             <React.Fragment>
@@ -54,11 +111,31 @@ import {paginate} from "../utils/paginate"
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">Title</th>
-                            <th scope="col">Genre</th>
-                            <th scope="col">Stock</th>
-                            <th scope="col">Rent</th>
-                            <th scope="col">Favourites</th>
+                            <th scope="col" ><span style={{cursor:"pointer"}}
+                                	            onClick={()=>this.sortHandler("title")}>Title</span>
+                                                    {this.state.sortBy==="title" ? 
+                                                    <i className={iconClass}></i> 
+                                                    :null}</th>
+
+                            <th scope="col" ><span style={{cursor:"pointer"}}
+                                                onClick={()=>this.sortHandler("genre.name")}>Genre</span>
+                                                    {this.state.sortBy==="genre.name" ? 
+                                                    <i className={iconClass}></i> 
+                                                    :null}</th>
+
+                            <th scope="col" ><span style={{cursor:"pointer"}}
+                                                onClick={()=>this.sortHandler("numberInStock")}>Stock</span>
+                                                    {this.state.sortBy==="numberInStock" ? 
+                                                    <i className={iconClass}></i> 
+                                                    :null}</th>
+
+                            <th scope="col" ><span style={{cursor:"pointer"}}
+                                                onClick={()=>this.sortHandler("dailyRentalRate")}>Rent</span>
+                                                    {this.state.sortBy==="dailyRentalRate" ? 
+                                                    <i className = {iconClass}></i> 
+                                                    :null}</th>
+
+                            <th scope="col">Favourites<i className=""></i></th>
                             <th scope="col"></th>
                         </tr>   
                     </thead>
@@ -85,6 +162,9 @@ import {paginate} from "../utils/paginate"
                 pageSize={pageSize} 
                 onPageChange = {this.handlePageChange}
                 currentPage = {currentPage}/>
+            
+            <Filter 
+                filterHandler={this.filterHandler}/>
             </React.Fragment>
         )
     }
